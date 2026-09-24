@@ -1,3 +1,4 @@
+import { Analytics } from '@vercel/analytics/react'
 import { Route, Routes, useLocation } from 'react-router-dom'
 import Footer from './components/layout/Footer'
 import Navbar from './components/layout/Navbar'
@@ -30,6 +31,12 @@ export default function App() {
         </Routes>
       </PageTransition>
       <Footer />
+      {import.meta.env.PROD && (
+        <Analytics
+          route={location.pathname}
+          path={`${location.pathname}${location.search}`}
+        />
+      )}
     </>
   )
 }
