@@ -1,12 +1,18 @@
 import { useEffect, useState } from 'react'
 import { useSearchParams } from 'react-router-dom'
-import { BROWSE_SORTS, buildDiscoverParams, tmdb } from '../api/tmdb'
+import {
+  BROWSE_SORTS,
+  buildDiscoverParams,
+  imageUrl,
+  tmdb,
+} from '../api/tmdb'
 import MediaGrid from '../components/media/MediaGrid'
 import Button from '../components/ui/Button'
 import Chip from '../components/ui/Chip'
 import Container from '../components/ui/Container'
 import Eyebrow from '../components/ui/Eyebrow'
 import { EmptyState, ErrorState } from '../components/ui/States'
+import { CloseIcon } from '../components/ui/icons'
 import { useDocumentTitle } from '../hooks/useDocumentTitle'
 import { useFetch } from '../hooks/useFetch'
 import { dedupeById } from '../utils/format'
@@ -30,6 +36,7 @@ export default function Browse({ mediaType }) {
   const [searchParams, setSearchParams] = useSearchParams()
   const genre = searchParams.get('genre') ?? ''
   const sort = searchParams.get('sort') ?? 'popular'
+  const provider = searchParams.get('provider') ?? ''
   const copy = COPY[mediaType]
 
   useDocumentTitle(copy.title)
@@ -39,6 +46,17 @@ export default function Browse({ mediaType }) {
     [mediaType]
   )
   const genres = genreData?.genres ?? []
+
+  const { data: providerList } = useFetch(
+    (signal) => tmdb.watchProviders(mediaType, undefined, signal),
+    [mediaType],
+    { enabled: Boolean(provider) }
+  )
+  const activeProvider = provider
+    ? providerList?.results?.find(
+        (item) => String(item.provider_id) === provider
+      )
+    : null
 
   const [items, setItems] = useState([])
   const [page, setPage] = useState(1)
@@ -57,7 +75,7 @@ export default function Browse({ mediaType }) {
       .discover(
         mediaType,
         {
-          ...buildDiscoverParams(mediaType, { genre, sort }),
+          ...buildDiscoverParams(mediaType, { genre, sort, provider }),
           page: 1,
         },
         controller.signal
@@ -75,7 +93,7 @@ export default function Browse({ mediaType }) {
       })
 
     return () => controller.abort()
-  }, [mediaType, genre, sort, reloadKey])
+  }, [mediaType, genre, sort, provider, reloadKey])
 
   const loadMore = () => {
     if (loadingMore || loading || page >= totalPages) return
@@ -84,7 +102,7 @@ export default function Browse({ mediaType }) {
 
     tmdb
       .discover(mediaType, {
-        ...buildDiscoverParams(mediaType, { genre, sort }),
+        ...buildDiscoverParams(mediaType, { genre, sort, provider }),
         page: nextPage,
       })
       .then((data) => {
@@ -111,6 +129,34 @@ export default function Browse({ mediaType }) {
         <h1 className="text-[clamp(2.2rem,4.6vw,3.3rem)]">{copy.title}</h1>
         <p className="text-base leading-[1.7] text-soft">{copy.blurb}</p>
       </header>
+
+      {provider && (
+        <div className="mb-5 flex flex-wrap items-center gap-2.5">
+          <span className="text-[0.82rem] font-semibold text-muted">
+            Streaming on
+          </span>
+          <Chip
+            as="button"
+            type="button"
+            active
+            className="gap-2"
+            aria-label={`Remove ${
+              activeProvider?.provider_name ?? 'provider'
+            } filter`}
+            onClick={() => updateParam('provider', '')}
+          >
+            {activeProvider?.logo_path && (
+              <img
+                src={imageUrl(activeProvider.logo_path, 'w45')}
+                alt=""
+                className="size-4 rounded-[4px]"
+              />
+            )}
+            {activeProvider?.provider_name ?? 'Selected service'}
+            <CloseIcon className="size-3.5" />
+          </Chip>
+        </div>
+      )}
 
       <div className="sticky top-[var(--nav-h)] z-20 mb-7 flex items-start justify-between gap-5 border-b border-border bg-background/92 py-3.5 backdrop-blur-md max-[860px]:flex-col max-[860px]:items-stretch max-[860px]:gap-3">
         <div
@@ -169,7 +215,13 @@ export default function Browse({ mediaType }) {
       ) : items.length === 0 ? (
         <EmptyState
           title="Nothing here yet"
-          message="Try a different genre or sort order."
+          message={
+            provider
+              ? `No titles found on ${
+                  activeProvider?.provider_name ?? 'this service'
+                } with these filters.`
+              : 'Try a different genre or sort order.'
+          }
         />
       ) : (
         <>

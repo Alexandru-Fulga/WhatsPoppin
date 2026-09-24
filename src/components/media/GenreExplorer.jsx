@@ -4,6 +4,7 @@ import { tmdb } from '../../api/tmdb'
 import { useFetch } from '../../hooks/useFetch'
 import { gsap, prefersReducedMotion } from '../../lib/gsap'
 import Eyebrow from '../ui/Eyebrow'
+import MediaTypeToggle from '../ui/MediaTypeToggle'
 
 export default function GenreExplorer() {
   const [mediaType, setMediaType] = useState('movie')
@@ -62,38 +63,11 @@ export default function GenreExplorer() {
             </h2>
           </div>
 
-          <div
-            className="inline-flex gap-1 rounded-full border border-cloud/15 bg-cloud/10 p-1.5"
-            role="tablist"
-            aria-label="Choose media type"
-          >
-            <button
-              type="button"
-              role="tab"
-              aria-selected={mediaType === 'movie'}
-              className={`rounded-full px-4.5 py-2 text-[0.86rem] font-semibold transition-colors duration-300 ${
-                mediaType === 'movie'
-                  ? 'bg-cloud text-ink'
-                  : 'text-cloud/75 hover:text-white'
-              }`}
-              onClick={() => setMediaType('movie')}
-            >
-              Movies
-            </button>
-            <button
-              type="button"
-              role="tab"
-              aria-selected={mediaType === 'tv'}
-              className={`rounded-full px-4.5 py-2 text-[0.86rem] font-semibold transition-colors duration-300 ${
-                mediaType === 'tv'
-                  ? 'bg-cloud text-ink'
-                  : 'text-cloud/75 hover:text-white'
-              }`}
-              onClick={() => setMediaType('tv')}
-            >
-              TV Shows
-            </button>
-          </div>
+          <MediaTypeToggle
+            value={mediaType}
+            onChange={setMediaType}
+            tone="dark"
+          />
         </div>
 
         <div className="relative z-10 flex flex-wrap gap-2.5" ref={listRef}>

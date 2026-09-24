@@ -4,6 +4,7 @@ import { tmdb } from '../api/tmdb'
 import GenreExplorer from '../components/media/GenreExplorer'
 import Hero from '../components/media/Hero'
 import MediaRow from '../components/media/MediaRow'
+import ProviderRail from '../components/media/ProviderRail'
 import Container from '../components/ui/Container'
 import SectionHeader from '../components/ui/SectionHeader'
 import { ErrorState } from '../components/ui/States'
@@ -112,6 +113,8 @@ export default function Home() {
           trailerLoading={trailerLoading}
         />
       )}
+
+      <ProviderRail />
 
       <RowSection
         eyebrow="What everyone is watching"
