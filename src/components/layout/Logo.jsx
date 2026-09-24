@@ -5,7 +5,7 @@ export default function Logo({ light = false, className = '' }) {
     <Link
       to="/"
       className={`inline-flex items-center gap-2.5 text-[1.28rem] leading-none transition-transform duration-300 hover:-translate-y-px max-[480px]:text-[1.1rem] ${className}`}
-      aria-label="WhatsPoppin — home"
+      aria-label="Whats-Poppin — home"
     >
       <span className="size-[38px] shrink-0 overflow-hidden rounded-[11px] shadow-[0_8px_20px_rgba(29,22,22,0.22)] transition-shadow duration-300 max-[480px]:size-8">
         <svg viewBox="0 0 64 64" className="size-full">
@@ -20,7 +20,7 @@ export default function Logo({ light = false, className = '' }) {
           light ? 'text-cloud' : 'text-foreground'
         }`}
       >
-        Whats
+        Whats-
         <em
           className={`font-display font-bold italic ${
             light ? 'text-cloud/80' : 'text-flame'

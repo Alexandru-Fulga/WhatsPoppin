@@ -4,7 +4,7 @@ export function useDocumentTitle(title) {
   useEffect(() => {
     if (!title) return
     const previous = document.title
-    document.title = `${title} | WhatsPoppin`
+    document.title = `${title} | Whats-Poppin`
     return () => {
       document.title = previous
     }

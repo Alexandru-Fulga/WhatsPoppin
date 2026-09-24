@@ -120,7 +120,7 @@ export default function Search() {
               Results for <em className="text-flame italic">“{query}”</em>
             </>
           ) : (
-            'Search WhatsPoppin'
+            'Search Whats-Poppin'
           )}
         </h1>
         <p className="text-base leading-[1.7] text-soft">

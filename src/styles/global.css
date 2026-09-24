@@ -3,7 +3,7 @@
 @custom-variant dark (&:where(.dark, .dark *));
 
 /* ==========================================================================
-   WhatsPoppin — Design tokens
+   Whats-Poppin — Design tokens
    Palette: #1D1616 · #8E1616 · #D84040 · #EEEEEE
    Type:    Inter (UI/body) · Lora (display/titles)
    ========================================================================== */

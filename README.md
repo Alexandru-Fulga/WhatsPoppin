@@ -1,4 +1,4 @@
-# WhatsPoppin
+# Whats-Poppin
 
 A modern movie & TV discovery app. Search for any title and see everything that matters: rating, release date, runtime/seasons, genres, cast & crew, official trailers, streaming availability by region, episode guides, recommendations and more.
 

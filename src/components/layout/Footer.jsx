@@ -48,7 +48,7 @@ export default function Footer() {
 
       <Container className="mt-14 flex items-center justify-between gap-5 border-t border-cloud/15 pt-6.5 max-[860px]:flex-col max-[860px]:items-start">
         <p className="text-[0.8rem] text-cloud/55">
-          © {new Date().getFullYear()} WhatsPoppin. All rights reserved.
+          © {new Date().getFullYear()} Whats-Poppin. All rights reserved.
         </p>
         <p className="max-w-[560px] text-right text-[0.8rem] text-cloud/55 max-[860px]:text-left">
           This product uses the TMDB API but is not endorsed or certified by
