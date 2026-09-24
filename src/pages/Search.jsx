@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react'
 import { useSearchParams } from 'react-router-dom'
 import { tmdb } from '../api/tmdb'
 import MediaGrid from '../components/media/MediaGrid'
-import SearchBar from '../components/search/SearchBar'
+import SearchForm from '../components/search/SearchForm'
 import Button from '../components/ui/Button'
 import Container from '../components/ui/Container'
 import Eyebrow from '../components/ui/Eyebrow'
@@ -129,7 +129,7 @@ export default function Search() {
             : 'Find movies, TV shows and people. Ratings, cast, trailers and where to stream — all in one place.'}
         </p>
         <div className="mt-1.5 max-w-[560px]">
-          <SearchBar autoFocus />
+          <SearchForm initialQuery={query} autoFocus />
         </div>
       </header>
 

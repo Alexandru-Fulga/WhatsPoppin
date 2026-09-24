@@ -10,7 +10,7 @@ import {
   getYear,
 } from '../../utils/format'
 import RatingPill from '../ui/RatingPill'
-import { CloseIcon, SearchIcon } from '../ui/icons'
+import SearchInput from './SearchInput'
 
 export default function SearchBar({
   onNavigate,
@@ -26,7 +26,6 @@ export default function SearchBar({
   const rootRef = useRef(null)
   const dropdownRef = useRef(null)
   const navigate = useNavigate()
-  const dark = variant === 'dark'
 
   useEffect(() => {
     const term = debounced.trim()
@@ -128,12 +127,6 @@ export default function SearchBar({
 
   const showDropdown = open && query.trim().length >= 2
 
-  const inputClasses = dark
-    ? 'border-cloud/30 bg-cloud/10 text-cloud placeholder:text-cloud/70 backdrop-blur-md focus:border-cloud/60 focus:bg-cloud/20 focus:ring-4 focus:ring-cloud/10'
-    : 'border-border bg-surface text-foreground placeholder:text-muted focus:border-flame focus:ring-4 focus:ring-flame/10'
-
-  const iconClasses = dark ? 'text-cloud/75' : 'text-muted'
-
   return (
     <form
       className="relative w-full"
@@ -141,35 +134,14 @@ export default function SearchBar({
       role="search"
       onSubmit={handleSubmit}
     >
-      <SearchIcon
-        className={`pointer-events-none absolute top-1/2 left-4 size-[18px] -translate-y-1/2 transition-colors ${iconClasses}`}
-      />
-      <input
-        className={`w-full rounded-full border-[1.5px] py-3 pr-11 pl-11 text-[0.92rem] transition-all duration-300 focus:outline-none ${inputClasses}`}
-        type="search"
+      <SearchInput
         value={query}
-        onChange={(event) => setQuery(event.target.value)}
+        onChange={setQuery}
         onFocus={() => query.trim().length >= 2 && setOpen(true)}
         onKeyDown={handleKeyDown}
-        placeholder="Search movies, series, people…"
-        aria-label="Search movies, TV shows and people"
-        autoComplete="off"
+        variant={variant}
         autoFocus={autoFocus}
       />
-      {query && (
-        <button
-          type="button"
-          className={`absolute top-1/2 right-3 grid size-[26px] -translate-y-1/2 place-items-center rounded-full transition-colors duration-200 ${
-            dark
-              ? 'text-cloud/75 hover:bg-cloud/15 hover:text-white'
-              : 'text-muted hover:bg-foreground/5 hover:text-foreground'
-          }`}
-          onClick={() => setQuery('')}
-          aria-label="Clear search"
-        >
-          <CloseIcon className="size-3.5" />
-        </button>
-      )}
 
       {showDropdown && (
         <div
