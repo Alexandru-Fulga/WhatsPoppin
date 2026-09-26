@@ -17,6 +17,9 @@ dist-ssr
 .env.*
 !.env.example
 
+# Local agent handoff notes (kept out of the repo on purpose)
+AGENTS.md
+
 # Editor directories and files
 .vscode/*
 !.vscode/extensions.json

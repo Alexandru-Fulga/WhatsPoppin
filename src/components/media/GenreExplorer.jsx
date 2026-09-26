@@ -21,18 +21,14 @@ export default function GenreExplorer() {
       return undefined
     }
 
-    const pills = list.querySelectorAll('.genre-pill')
-    if (!pills.length) return undefined
-
     const ctx = gsap.context(() => {
       gsap.fromTo(
-        pills,
-        { opacity: 0, y: 14 },
+        list,
+        { opacity: 0, y: 12 },
         {
           opacity: 1,
           y: 0,
           duration: 0.5,
-          stagger: 0.03,
           ease: 'power2.out',
           clearProps: 'opacity,transform',
           scrollTrigger: {

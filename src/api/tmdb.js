@@ -152,26 +152,37 @@ export const FEATURED_PROVIDERS = [
 export const BROWSE_SORTS = {
   movie: [
     { value: 'popular', label: 'Most popular' },
-    { value: 'top_rated', label: 'Top rated' },
-    { value: 'newest', label: 'Newest' },
-    { value: 'upcoming', label: 'Upcoming' },
+    { value: 'top_rated', label: 'Highest rated' },
+    { value: 'most_voted', label: 'Most voted' },
+    { value: 'revenue', label: 'Biggest box office' },
+    { value: 'newest', label: 'Newest releases' },
+    { value: 'upcoming', label: 'Coming soon' },
+    { value: 'az', label: 'A–Z' },
   ],
   tv: [
     { value: 'popular', label: 'Most popular' },
-    { value: 'top_rated', label: 'Top rated' },
+    { value: 'top_rated', label: 'Highest rated' },
+    { value: 'most_voted', label: 'Most voted' },
     { value: 'newest', label: 'Newest' },
-    { value: 'on_the_air', label: 'On the air' },
+    { value: 'on_the_air', label: 'Currently airing' },
+    { value: 'az', label: 'A–Z' },
   ],
 }
 
 export function buildDiscoverParams(
   mediaType,
-  { genre, sort, provider, region = DEFAULT_REGION } = {}
+  { genre, sort, provider, year, region = DEFAULT_REGION } = {}
 ) {
   const params = { page: 1, include_adult: false }
   const today = new Date().toISOString().slice(0, 10)
+  const isMovie = mediaType === 'movie'
+  const hasYear = Boolean(year)
 
   if (genre) params.with_genres = genre
+
+  if (hasYear) {
+    params[isMovie ? 'primary_release_year' : 'first_air_date_year'] = year
+  }
 
   if (provider) {
     params.with_watch_providers = provider
@@ -182,20 +193,33 @@ export function buildDiscoverParams(
   switch (sort) {
     case 'top_rated':
       params.sort_by = 'vote_average.desc'
-      params['vote_count.gte'] = 300
+      params['vote_count.gte'] = hasYear ? 100 : 300
+      break
+    case 'most_voted':
+      params.sort_by = 'vote_count.desc'
+      break
+    case 'revenue':
+      params.sort_by = isMovie ? 'revenue.desc' : 'popularity.desc'
+      break
+    case 'az':
+      params.sort_by = isMovie ? 'original_title.asc' : 'original_name.asc'
       break
     case 'newest':
-      params.sort_by = mediaType === 'movie' ? 'primary_release_date.desc' : 'first_air_date.desc'
-      if (mediaType === 'movie') params['primary_release_date.lte'] = today
-      else params['first_air_date.lte'] = today
+      params.sort_by = isMovie
+        ? 'primary_release_date.desc'
+        : 'first_air_date.desc'
+      if (!hasYear) {
+        params[isMovie ? 'primary_release_date.lte' : 'first_air_date.lte'] =
+          today
+      }
       break
     case 'upcoming':
       params.sort_by = 'popularity.desc'
-      params['primary_release_date.gte'] = today
+      if (isMovie && !hasYear) params['primary_release_date.gte'] = today
       break
     case 'on_the_air':
       params.sort_by = 'popularity.desc'
-      params['air_date.gte'] = today
+      if (!isMovie && !hasYear) params['air_date.gte'] = today
       break
     case 'popular':
     default:

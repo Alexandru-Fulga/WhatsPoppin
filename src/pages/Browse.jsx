@@ -1,18 +1,12 @@
 import { useEffect, useState } from 'react'
 import { useSearchParams } from 'react-router-dom'
-import {
-  BROWSE_SORTS,
-  buildDiscoverParams,
-  imageUrl,
-  tmdb,
-} from '../api/tmdb'
+import { buildDiscoverParams, tmdb } from '../api/tmdb'
+import BrowseFilters from '../components/media/BrowseFilters'
 import MediaGrid from '../components/media/MediaGrid'
 import Button from '../components/ui/Button'
-import Chip from '../components/ui/Chip'
 import Container from '../components/ui/Container'
 import Eyebrow from '../components/ui/Eyebrow'
 import { EmptyState, ErrorState } from '../components/ui/States'
-import { CloseIcon } from '../components/ui/icons'
 import { useDocumentTitle } from '../hooks/useDocumentTitle'
 import { useFetch } from '../hooks/useFetch'
 import { dedupeById } from '../utils/format'
@@ -37,6 +31,7 @@ export default function Browse({ mediaType }) {
   const genre = searchParams.get('genre') ?? ''
   const sort = searchParams.get('sort') ?? 'popular'
   const provider = searchParams.get('provider') ?? ''
+  const year = searchParams.get('year') ?? ''
   const copy = COPY[mediaType]
 
   useDocumentTitle(copy.title)
@@ -75,7 +70,7 @@ export default function Browse({ mediaType }) {
       .discover(
         mediaType,
         {
-          ...buildDiscoverParams(mediaType, { genre, sort, provider }),
+          ...buildDiscoverParams(mediaType, { genre, sort, provider, year }),
           page: 1,
         },
         controller.signal
@@ -93,7 +88,7 @@ export default function Browse({ mediaType }) {
       })
 
     return () => controller.abort()
-  }, [mediaType, genre, sort, provider, reloadKey])
+  }, [mediaType, genre, sort, provider, year, reloadKey])
 
   const loadMore = () => {
     if (loadingMore || loading || page >= totalPages) return
@@ -122,6 +117,8 @@ export default function Browse({ mediaType }) {
     setSearchParams(next)
   }
 
+  const clearFilters = () => setSearchParams(new URLSearchParams())
+
   return (
     <Container className="pt-[calc(var(--nav-h)+56px)]">
       <header className="mb-9 flex max-w-[720px] flex-col gap-3.5">
@@ -130,80 +127,17 @@ export default function Browse({ mediaType }) {
         <p className="text-base leading-[1.7] text-soft">{copy.blurb}</p>
       </header>
 
-      {provider && (
-        <div className="mb-5 flex flex-wrap items-center gap-2.5">
-          <span className="text-[0.82rem] font-semibold text-muted">
-            Streaming on
-          </span>
-          <Chip
-            as="button"
-            type="button"
-            active
-            className="gap-2"
-            aria-label={`Remove ${
-              activeProvider?.provider_name ?? 'provider'
-            } filter`}
-            onClick={() => updateParam('provider', '')}
-          >
-            {activeProvider?.logo_path && (
-              <img
-                src={imageUrl(activeProvider.logo_path, 'w45')}
-                alt=""
-                className="size-4 rounded-[4px]"
-              />
-            )}
-            {activeProvider?.provider_name ?? 'Selected service'}
-            <CloseIcon className="size-3.5" />
-          </Chip>
-        </div>
-      )}
-
-      <div className="sticky top-[var(--nav-h)] z-20 mb-7 flex items-start justify-between gap-5 border-b border-border bg-background/92 py-3.5 backdrop-blur-md max-[860px]:flex-col max-[860px]:items-stretch max-[860px]:gap-3">
-        <div
-          className="no-scrollbar flex flex-1 flex-wrap gap-2 max-[860px]:flex-nowrap max-[860px]:overflow-x-auto max-[860px]:pb-1.5"
-          role="group"
-          aria-label="Filter by genre"
-        >
-          <Chip
-            as="button"
-            type="button"
-            active={!genre}
-            className="max-[860px]:shrink-0"
-            onClick={() => updateParam('genre', '')}
-          >
-            All genres
-          </Chip>
-          {genres.map((item) => (
-            <Chip
-              key={item.id}
-              as="button"
-              type="button"
-              active={String(item.id) === genre}
-              className="max-[860px]:shrink-0"
-              onClick={() => updateParam('genre', String(item.id))}
-            >
-              {item.name}
-            </Chip>
-          ))}
-        </div>
-
-        <label className="flex shrink-0 items-center gap-2.5 pt-0.5 max-[860px]:justify-end">
-          <span className="text-[0.8rem] font-semibold whitespace-nowrap text-muted">
-            Sort by
-          </span>
-          <select
-            className="cursor-pointer rounded-lg border border-border bg-surface px-3 py-2 text-[0.85rem] font-medium text-foreground transition-all focus:border-flame focus:ring-3 focus:ring-flame/15 focus:outline-none"
-            value={sort}
-            onChange={(event) => updateParam('sort', event.target.value)}
-          >
-            {BROWSE_SORTS[mediaType].map((option) => (
-              <option key={option.value} value={option.value}>
-                {option.label}
-              </option>
-            ))}
-          </select>
-        </label>
-      </div>
+      <BrowseFilters
+        mediaType={mediaType}
+        genres={genres}
+        genre={genre}
+        sort={sort}
+        year={year}
+        provider={provider}
+        activeProvider={activeProvider}
+        onChange={updateParam}
+        onClear={clearFilters}
+      />
 
       {error ? (
         <ErrorState
@@ -220,7 +154,9 @@ export default function Browse({ mediaType }) {
               ? `No titles found on ${
                   activeProvider?.provider_name ?? 'this service'
                 } with these filters.`
-              : 'Try a different genre or sort order.'
+              : year
+                ? `No titles found from ${year} with these filters.`
+                : 'Try a different genre, year or sort order.'
           }
         />
       ) : (

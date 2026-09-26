@@ -176,6 +176,24 @@ export function InfoIcon({ className = '' }) {
   )
 }
 
+export function TagIcon({ className = '' }) {
+  return (
+    <svg className={className} viewBox="0 0 24 24" {...strokeProps} aria-hidden="true">
+      <path d="M11.4 3.5H19a1.5 1.5 0 011.5 1.5v7.6a2 2 0 01-.59 1.42l-5.9 5.9a2 2 0 01-2.82 0l-6.1-6.1a2 2 0 010-2.82l5.9-5.9a2 2 0 011.41-.6z" />
+      <circle cx="16" cy="8" r="1.35" />
+    </svg>
+  )
+}
+
+export function SortIcon({ className = '' }) {
+  return (
+    <svg className={className} viewBox="0 0 24 24" {...strokeProps} aria-hidden="true">
+      <path d="M7 4.5v15M7 19.5l-3-3M7 19.5l3-3" />
+      <path d="M17 19.5v-15M17 4.5l-3 3M17 4.5l3 3" />
+    </svg>
+  )
+}
+
 export function SunIcon({ className = '' }) {
   return (
     <svg className={className} viewBox="0 0 24 24" {...strokeProps} aria-hidden="true">
