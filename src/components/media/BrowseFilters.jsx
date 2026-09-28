@@ -70,7 +70,7 @@ export default function BrowseFilters({
         panelClassName="w-[min(420px,calc(100vw-40px))]"
       >
         {({ close }) => (
-          <div className="flex max-h-[min(70vh,420px)] flex-wrap content-start gap-2 overflow-y-auto">
+          <div className="flex max-h-[min(70vh,420px)] flex-wrap content-start gap-2 overflow-y-auto p-1">
             <Chip
               as="button"
               type="button"
@@ -108,7 +108,7 @@ export default function BrowseFilters({
         panelClassName="w-[min(300px,calc(100vw-40px))]"
       >
         {({ close }) => (
-          <div className="grid max-h-[min(60vh,320px)] grid-cols-4 gap-1.5 overflow-y-auto pr-0.5">
+          <div className="grid max-h-[min(60vh,320px)] grid-cols-4 gap-1.5 overflow-y-auto p-1">
             <Chip
               as="button"
               type="button"

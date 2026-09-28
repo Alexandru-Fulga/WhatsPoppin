@@ -3,12 +3,20 @@ import { tmdb } from '../../api/tmdb'
 import { prefersReducedMotion } from '../../lib/gsap'
 import { getMediaType, getTitle, getYear } from '../../utils/format'
 import Button from '../ui/Button'
+import Chip from '../ui/Chip'
 import Container from '../ui/Container'
+import Eyebrow from '../ui/Eyebrow'
+import FilterDropdown from '../ui/FilterDropdown'
 import MediaTypeToggle from '../ui/MediaTypeToggle'
 import RatingPill from '../ui/RatingPill'
-import SectionHeader from '../ui/SectionHeader'
-import { ChevronLeftIcon, ChevronRightIcon, StarIcon } from '../ui/icons'
+import {
+  ChevronLeftIcon,
+  ChevronRightIcon,
+  StarIcon,
+  TagIcon,
+} from '../ui/icons'
 import MediaCard from './MediaCard'
+import { useFetch } from '../../hooks/useFetch'
 
 function shuffle(items) {
   const shuffled = [...items]
@@ -23,6 +31,7 @@ function shuffle(items) {
 
 export default function LuckyPick() {
   const [mediaType, setMediaType] = useState('movie')
+  const [genre, setGenre] = useState('')
   const [items, setItems] = useState([])
   const [activeIndex, setActiveIndex] = useState(0)
   const [loading, setLoading] = useState(false)
@@ -31,6 +40,14 @@ export default function LuckyPick() {
   const [spinDelay, setSpinDelay] = useState(420)
   const timerRef = useRef(null)
   const requestRef = useRef(null)
+  const {
+    data: genreData,
+    loading: genresLoading,
+    error: genresError,
+  } = useFetch((signal) => tmdb.genres(mediaType, signal), [mediaType])
+
+  const genres = genreData?.genres ?? []
+  const selectedGenre = genres.find((item) => String(item.id) === genre)
 
   useEffect(
     () => () => {
@@ -59,6 +76,7 @@ export default function LuckyPick() {
           sort_by: 'popularity.desc',
           include_adult: false,
           'vote_count.gte': 50,
+          with_genres: genre || undefined,
         },
         controller.signal
       )
@@ -119,6 +137,7 @@ export default function LuckyPick() {
     window.clearTimeout(timerRef.current)
     requestRef.current?.abort()
     setMediaType(nextType)
+    setGenre('')
     setItems([])
     setActiveIndex(0)
     setLoading(false)
@@ -137,12 +156,65 @@ export default function LuckyPick() {
   return (
     <section className="mt-18 max-sm:mt-13">
       <Container>
-        <SectionHeader
-          eyebrow="Your next watch"
-          title="Can't decide what to watch?"
-        >
-          <MediaTypeToggle value={mediaType} onChange={changeMediaType} />
-        </SectionHeader>
+        <div className="mb-7 flex items-end justify-between gap-6 max-sm:flex-col max-sm:items-start max-sm:gap-3.5">
+          <div className="flex flex-col gap-2.5">
+            <Eyebrow>Your next watch</Eyebrow>
+            <h2 className="text-[clamp(1.5rem,2.6vw,2.1rem)] text-foreground">
+              Can't decide what to watch?
+            </h2>
+          </div>
+          <div className="flex min-w-0 flex-wrap items-center justify-end gap-3 pb-1 max-sm:w-full max-sm:pb-0">
+            <FilterDropdown
+              label="Genre"
+              value={selectedGenre?.name}
+              icon={TagIcon}
+              active={Boolean(genre)}
+              align="right"
+              panelClassName="w-[min(420px,calc(100vw-40px))]"
+            >
+              {({ close }) => (
+                <div className="flex max-h-[min(60vh,360px)] flex-wrap content-start gap-2 overflow-y-auto p-1">
+                  <Chip
+                    as="button"
+                    type="button"
+                    active={!genre}
+                    onClick={() => {
+                      setGenre('')
+                      close()
+                    }}
+                  >
+                    Any genre
+                  </Chip>
+                  {genres.map((item) => (
+                    <Chip
+                      key={item.id}
+                      as="button"
+                      type="button"
+                      active={String(item.id) === genre}
+                      onClick={() => {
+                        setGenre(String(item.id))
+                        close()
+                      }}
+                    >
+                      {item.name}
+                    </Chip>
+                  ))}
+                  {genresLoading && (
+                    <p className="w-full px-2 py-1 text-sm text-muted" role="status">
+                      Loading genres…
+                    </p>
+                  )}
+                  {genresError && (
+                    <p className="w-full px-2 py-1 text-sm text-flame" role="alert">
+                      Genres could not be loaded.
+                    </p>
+                  )}
+                </div>
+              )}
+            </FilterDropdown>
+            <MediaTypeToggle value={mediaType} onChange={changeMediaType} />
+          </div>
+        </div>
 
         <div className="grid overflow-hidden rounded-3xl border border-border bg-gradient-to-br from-flame/10 via-surface to-surface-muted shadow-soft lg:grid-cols-[0.8fr_1.2fr]">
           <div className="flex flex-col items-start justify-center p-6 sm:p-9 lg:p-11">
@@ -153,11 +225,12 @@ export default function LuckyPick() {
               Leave it to fate.
             </h3>
             <p className="mt-3 max-w-sm text-[0.95rem] leading-relaxed text-muted">
-              Let us find a {mediaType === 'tv' ? 'series' : 'movie'} for you.
-              You can spin again or browse the picks.
+              Pick a genre or let us surprise you with a random{' '}
+              {mediaType === 'tv' ? 'series' : 'movie'}. Spin again or browse
+              the picks.
             </p>
             <Button
-              className="mt-6"
+              className="mt-5"
               onClick={handlePick}
               disabled={loading || spinning}
             >
