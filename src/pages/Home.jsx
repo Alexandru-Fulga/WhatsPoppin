@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom'
 import { tmdb } from '../api/tmdb'
 import GenreExplorer from '../components/media/GenreExplorer'
 import Hero from '../components/media/Hero'
+import LuckyPick from '../components/media/LuckyPick'
 import MediaRow from '../components/media/MediaRow'
 import ProviderRail from '../components/media/ProviderRail'
 import Container from '../components/ui/Container'
@@ -115,6 +116,8 @@ export default function Home() {
       )}
 
       <ProviderRail />
+
+      <LuckyPick />
 
       <RowSection
         eyebrow="What everyone is watching"
